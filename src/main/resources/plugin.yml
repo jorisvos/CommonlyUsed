@@ -1,0 +1,76 @@
+name: CommonlyUsed
+version: '${project.version}'
+main: nl.jorisvos.commonlyused.CommonlyUsed
+api-version: '1.20'
+prefix: CommonlyU
+authors: [Joris Vos]
+description: A plugin that provides the users with all essential/commonly used commands on survival servers.
+permissions:
+  commonlyused.command.sethome:
+    description: Allows players to set their home location.
+    default: true
+  commonlyused.command.home:
+    description: Allows players to teleport to their home location.
+    default: true
+  commonlyused.command.delhome:
+    description: Allows players to remove their home location.
+    default: true
+  commonlyused.command.back:
+    description: Allows players to teleport to their last location.
+    default: true
+  commonlyused.command.setspawn:
+    description: Allows players to set the world spawn.
+    default: op
+    children:
+      commonlyused.command.setspawn.player:
+        description: Allows players to set the spawn to another player's location.
+        default: op
+      commonlyused.command.setspawn.custom:
+        description: Allows players to set a custom spawn location.
+        default: op
+  commonlyused.command.spawn:
+    description: Allows players to teleport to the spawn of the world they are currently in.
+    default: true
+  commonlyused.command.setwarp:
+    description: Allows players to set a warp location.
+    default: op
+  commonlyused.command.delwarp:
+    description: Allows players to delete a warp location.
+    default: op
+  commonlyused.command.warp:
+    description: Allows players to teleport to a warp location.
+    default: true
+  commonlyused.command.warplist:
+    description: Allows players to retrieve a list with warp locations.
+    default: true
+commands:
+  sethome:
+    description: Set your home location.
+    permission: commonlyused.command.sethome
+  home:
+    description: Teleport to your home location after a 3 second cooldown.
+    permission: commonlyused.command.home
+  delhome:
+    description: Remove your home location.
+    permission: commonlyused.command.delhome
+  back:
+    description: Teleport to your last location after a 3 second cooldown.
+    permission: commonlyused.command.back
+  setspawn:
+    description: Set the world spawn.
+    permission: commonlyused.command.setspawn
+  spawn:
+    description: Teleport to the world spawn after a 3 second cooldown.
+    permission: commonlyused.command.spawn
+  setwarp:
+    description: Set a warp location.
+    permission: commonlyused.command.setwarp
+  delwarp:
+    description: Delete a warp location.
+    permission: commonlyused.command.delwarp
+  warp:
+    description: Teleport to a warp location after a 3 second cooldown.
+    permission: commonlyused.command.warp
+  warplist:
+    description: Displays a list of warp locations.
+    permission: commonlyused.command.warplist
