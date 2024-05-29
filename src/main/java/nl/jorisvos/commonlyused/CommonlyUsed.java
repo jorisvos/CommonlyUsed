@@ -1,9 +1,6 @@
 package nl.jorisvos.commonlyused;
 
-import nl.jorisvos.commonlyused.commands.BackCommand;
-import nl.jorisvos.commonlyused.commands.HomeCommands;
-import nl.jorisvos.commonlyused.commands.SpawnCommands;
-import nl.jorisvos.commonlyused.commands.WarpCommands;
+import nl.jorisvos.commonlyused.commands.*;
 import nl.jorisvos.commonlyused.listeners.BackListener;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -26,6 +23,7 @@ public final class CommonlyUsed extends JavaPlugin {
 
         // Register commands
         getCommand("back").setExecutor(new BackCommand(this));
+        getCommand("slimechunk").setExecutor(new SlimeChunkCommand(this));
         // home commands
         HomeCommands homeCommands = new HomeCommands(this);
         getCommand("sethome").setExecutor(homeCommands);

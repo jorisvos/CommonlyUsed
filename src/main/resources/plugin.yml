@@ -43,6 +43,9 @@ permissions:
   commonlyused.command.warplist:
     description: Allows players to retrieve a list with warp locations.
     default: true
+  commonlyused.command.slimechunk:
+    description: Allows players to display if current chunk is a slime chunk.
+    default: false
 commands:
   sethome:
     description: Set your home location.
@@ -74,3 +77,6 @@ commands:
   warplist:
     description: Displays a list of warp locations.
     permission: commonlyused.command.warplist
+  slimechunk:
+    description: Displays if current chunk is a slime chunk.
+    permission: commonlyused.command.slimechunk
