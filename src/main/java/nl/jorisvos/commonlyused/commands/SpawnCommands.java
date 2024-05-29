@@ -1,22 +1,22 @@
 package nl.jorisvos.commonlyused.commands;
 
 import nl.jorisvos.commonlyused.CommonlyUsed;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class SpawnCommands implements CommandExecutor {
-    private CommonlyUsed plugin;
-    private FileConfiguration config;
+public class SpawnCommands implements CommandExecutor, TabCompleter {
+    private final CommonlyUsed plugin;
+    private final FileConfiguration config;
     private final Map<UUID, Long> spawnCooldowns = new HashMap<>();
 
     public SpawnCommands(CommonlyUsed plugin) {
@@ -40,6 +40,23 @@ public class SpawnCommands implements CommandExecutor {
         }
 
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (args.length == 1) {
+            List<String> playerNames = new ArrayList<>();
+            playerNames.add("<x> <y> <z>");
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                playerNames.add(player.getName());
+            }
+            return playerNames.stream().filter(name -> name.startsWith(args[0])).collect(Collectors.toList());
+        } else if (args.length > 1 && args.length <= 3) {
+            List<String> playerNames = new ArrayList<>();
+            playerNames.add("<x> <y> <z>");
+            return playerNames;
+        }
+        return null;
     }
 
     private void setSpawn(Player player, String[] args) {
@@ -94,8 +111,8 @@ public class SpawnCommands implements CommandExecutor {
         if (plugin.isPlayerOnTeleportCooldown(player.getUniqueId())) {
             player.sendMessage(plugin.getTeleportCooldownMessage(player.getUniqueId()));
             return;
-        } else if (spawnCooldowns.containsKey(player.getUniqueId()) && System.currentTimeMillis() - spawnCooldowns.get(player.getUniqueId()) < 120000) {
-            long remainingTime = 120000 - (System.currentTimeMillis() - spawnCooldowns.get(player.getUniqueId()));
+        } else if (spawnCooldowns.containsKey(player.getUniqueId()) && System.currentTimeMillis() - spawnCooldowns.get(player.getUniqueId()) < (plugin.getSettings().getSpawnCooldown()*1000L)) {
+            long remainingTime = (plugin.getSettings().getSpawnCooldown()*1000L) - (System.currentTimeMillis() - spawnCooldowns.get(player.getUniqueId()));
             player.sendMessage(plugin.prefix+"§cYou must wait §6" + (remainingTime / 1000) + " §cseconds before you can teleport to spawn again.");
             return;
         }
@@ -108,7 +125,7 @@ public class SpawnCommands implements CommandExecutor {
             player.sendMessage(plugin.prefix+"§cNo spawn set for this world. Teleporting to world spawn.");
             spawnLocation = world.getSpawnLocation();
         }
-        plugin.teleportAfterDelay(player, spawnLocation, 3, "Teleported to spawn.");
+        plugin.teleportAfterDelay(player, spawnLocation, plugin.getSettings().getSpawnDelay(), "Teleported to spawn.");
     }
 
     private void setWorldSpawn(Player player, Location location) {

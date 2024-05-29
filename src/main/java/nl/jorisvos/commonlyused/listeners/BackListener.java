@@ -16,8 +16,10 @@ public class BackListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        Location deathLocation = event.getEntity().getLocation();
-        plugin.setLastLocation(event.getEntity().getUniqueId(), deathLocation);
+        if (plugin.getSettings().getSaveDeathAsLastLocation()) {
+            Location deathLocation = event.getEntity().getLocation();
+            plugin.setLastLocation(event.getEntity().getUniqueId(), deathLocation);
+        }
     }
 
     @EventHandler

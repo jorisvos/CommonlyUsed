@@ -5,7 +5,88 @@ api-version: '1.20'
 prefix: CommonlyU
 authors: [Joris Vos]
 description: A plugin that provides the users with all essential/commonly used commands on survival servers.
+commands:
+  sethome:
+    description: Set your home location.
+    permission: commonlyused.command.sethome
+  home:
+    description: Teleport to your home location after a 3 second cooldown.
+    permission: commonlyused.command.home
+  delhome:
+    description: Remove your home location.
+    permission: commonlyused.command.delhome
+  back:
+    description: Teleport to your last location after a 3 second cooldown.
+    permission: commonlyused.command.back
+    aliases: [b]
+  setspawn:
+    description: Set the world spawn.
+    permission: commonlyused.command.setspawn
+  spawn:
+    description: Teleport to the world spawn after a 3 second cooldown.
+    permission: commonlyused.command.spawn
+  setwarp:
+    description: Set a warp location.
+    permission: commonlyused.command.setwarp
+  delwarp:
+    description: Delete a warp location.
+    permission: commonlyused.command.delwarp
+  warp:
+    description: Teleport to a warp location after a 3 second cooldown.
+    permission: commonlyused.command.warp
+    aliases: [w]
+  warplist:
+    description: Displays a list of warp locations.
+    permission: commonlyused.command.warplist
+  slimechunk:
+    description: Displays if current chunk is a slime chunk and if not displays the coordinates of the closest slime chunk.
+    permission: commonlyused.command.slimechunk
+  craft:
+    description: Opens a crafting table for the player (without the need to craft- and place one).
+    permission: commonlyused.command.workbench
+    aliases: [workbench, craftingbench]
+  enderchest:
+    description: Opens your enderchest.
+    permission: commonlyused.command.enderchest
+    aliases: [enderc, ender, echest]
+  inventory:
+    description: Opens an inventory of [player]
+    permission: commonlyused.command.inventory
+    aliases: [invsee, inventorysee, seeinv]
 permissions:
+  commonlyused.*:
+    description: Grants access to all CommonlyUsed permissions.
+    default: op
+    children:
+      commonlyused.all: true
+  commonlyused.all:
+    description: Grants access to all CommonlyUsed permissions.
+    default: op
+    children:
+      commonlyused.command.all: true
+  commonlyused.command.*:
+    description: Grants access to all CommonlyUsed commands.
+    default: op
+    children:
+      commonlyused.command.all: true
+  commonlyused.command.all:
+    description: Grants access to all CommonlyUsed commands.
+    default: op
+    children:
+      commonlyused.command.sethome: true
+      commonlyused.command.home: true
+      commonlyused.command.delhome: true
+      commonlyused.command.back: true
+      commonlyused.command.setspawn: true
+      commonlyused.command.spawn: true
+      commonlyused.command.setwarp: true
+      commonlyused.command.delwarp: true
+      commonlyused.command.warp: true
+      commonlyused.command.warplist: true
+      commonlyused.command.slimechunk: true
+      commonlyused.command.workbench: true
+      commonlyused.command.enderchest: true
+      commonlyused.command.inventory: true
   commonlyused.command.sethome:
     description: Allows players to set their home location.
     default: true
@@ -44,39 +125,14 @@ permissions:
     description: Allows players to retrieve a list with warp locations.
     default: true
   commonlyused.command.slimechunk:
-    description: Allows players to display if current chunk is a slime chunk.
+    description: Allows players to display if current chunk is a slime chunk and if not display coordinates of the closest slime chunk.
     default: false
-commands:
-  sethome:
-    description: Set your home location.
-    permission: commonlyused.command.sethome
-  home:
-    description: Teleport to your home location after a 3 second cooldown.
-    permission: commonlyused.command.home
-  delhome:
-    description: Remove your home location.
-    permission: commonlyused.command.delhome
-  back:
-    description: Teleport to your last location after a 3 second cooldown.
-    permission: commonlyused.command.back
-  setspawn:
-    description: Set the world spawn.
-    permission: commonlyused.command.setspawn
-  spawn:
-    description: Teleport to the world spawn after a 3 second cooldown.
-    permission: commonlyused.command.spawn
-  setwarp:
-    description: Set a warp location.
-    permission: commonlyused.command.setwarp
-  delwarp:
-    description: Delete a warp location.
-    permission: commonlyused.command.delwarp
-  warp:
-    description: Teleport to a warp location after a 3 second cooldown.
-    permission: commonlyused.command.warp
-  warplist:
-    description: Displays a list of warp locations.
-    permission: commonlyused.command.warplist
-  slimechunk:
-    description: Displays if current chunk is a slime chunk.
-    permission: commonlyused.command.slimechunk
+  commonlyused.command.workbench:
+    description: Allows players to open a workbench without having one in your inventory or place one.
+    default: true
+  commonlyused.command.enderchest:
+    description: Allows players to open an enderchest
+    default: false
+  commonlyused.command.inventory:
+    description: Allows players to open an inventory of [player].
+    default: false

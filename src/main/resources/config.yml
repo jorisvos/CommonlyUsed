@@ -1,0 +1,22 @@
+# When the `/slimechunk` command is used and the player is currently not in a slimechunk the plugin
+# will look for the first slime chunk inside the radius defined below.
+# A radius of 5 will look for 5 chunks north, east, south and west of the player. So a total of 100 chunks.
+# (so a value of 50 will look through 100000 chunks if there is no slime chunk found already).
+slimeChunkSearchRadius: 50
+# Save the death location of players, so they can use the /back command to return to their death location.
+saveDeathAsLastLocation: true
+
+# The cooldowns for the different commands (wait n seconds before you can use the command again)
+cooldowns:
+  teleport: 15 # overall cooldown between different commands: /back -> (wait 15 seconds) -> /home
+  back: 30
+  home: 60
+  spawn: 120
+  warp: 120
+
+# The delays for the different commands (wait n seconds after issuing the command before it gets executed).
+delays:
+  back: 3
+  home: 3
+  spawn: 3
+  warp: 3

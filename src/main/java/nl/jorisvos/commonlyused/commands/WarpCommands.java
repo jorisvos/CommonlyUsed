@@ -5,17 +5,17 @@ import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class WarpCommands implements CommandExecutor {
+public class WarpCommands implements CommandExecutor, TabCompleter {
     private final CommonlyUsed plugin;
     private final Map<String, Location> warpLocations = new HashMap<>();
     private final Map<UUID, Long> warpCooldowns = new HashMap<>();
@@ -28,6 +28,7 @@ public class WarpCommands implements CommandExecutor {
         // Initialize config file
         configFile = new File(plugin.getDataFolder(), "warps.yml");
         if (!configFile.exists()) {
+            //noinspection ResultOfMethodCallIgnored
             configFile.getParentFile().mkdirs();
             plugin.saveResource("warps.yml", false);
         }
@@ -57,6 +58,15 @@ public class WarpCommands implements CommandExecutor {
             warp(player, args[0]);
         }
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (args.length == 1) {
+            List<String> warpNames = new ArrayList<>(warpLocations.keySet());
+            return warpNames.stream().filter(name -> name.startsWith(args[0])).collect(Collectors.toList());
+        }
+        return null;
     }
 
     private void setWarp(Player player, String warpName) {
@@ -100,13 +110,16 @@ public class WarpCommands implements CommandExecutor {
         if (warpName.isBlank()) {
             player.sendMessage(plugin.prefix+"§cYou can't leave the warp name empty.");
             return;
+        } else if (!warpLocations.containsKey(warpName)) {
+            player.sendMessage(plugin.prefix+"§cThat's not a valid warp name!");
+            return;
         }
 
         if (plugin.isPlayerOnTeleportCooldown(player.getUniqueId())) {
             player.sendMessage(plugin.getTeleportCooldownMessage(player.getUniqueId()));
             return;
-        } else if (warpCooldowns.containsKey(player.getUniqueId()) && System.currentTimeMillis() - warpCooldowns.get(player.getUniqueId()) < 120000) {
-            long remainingTime = 120000 - (System.currentTimeMillis() - warpCooldowns.get(player.getUniqueId()));
+        } else if (warpCooldowns.containsKey(player.getUniqueId()) && System.currentTimeMillis() - warpCooldowns.get(player.getUniqueId()) < (plugin.getSettings().getWarpCooldown() * 1000L)) {
+            long remainingTime = (plugin.getSettings().getWarpCooldown() * 1000L) - (System.currentTimeMillis() - warpCooldowns.get(player.getUniqueId()));
             player.sendMessage(plugin.prefix + "§cYou must wait §6" + (remainingTime / 1000) + " §cseconds before you can warp again.");
             return;
         }
@@ -114,7 +127,7 @@ public class WarpCommands implements CommandExecutor {
         Location warpLocation = warpLocations.get(warpName);
         warpCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
         plugin.addTeleportCooldown(player.getUniqueId());
-        plugin.teleportAfterDelay(player, warpLocation, 5, "Warp[§6"+warpName+"§a] location removed.");
+        plugin.teleportAfterDelay(player, warpLocation, plugin.getSettings().getWarpDelay(), "Teleported to warp[§6"+warpName+"§a].");
     }
 
     private void warpList(Player player) {
@@ -164,7 +177,6 @@ public class WarpCommands implements CommandExecutor {
             config.save(configFile);
         } catch (IOException e) {
             plugin.getLogger().warning("Could not save warp locations to file.");
-            e.printStackTrace();
         }
     }
 }

@@ -2,6 +2,7 @@ package nl.jorisvos.commonlyused;
 
 import nl.jorisvos.commonlyused.commands.*;
 import nl.jorisvos.commonlyused.listeners.BackListener;
+import nl.jorisvos.commonlyused.tabcompleters.PlayerNameTabCompleter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,9 +14,9 @@ import java.util.UUID;
 
 public final class CommonlyUsed extends JavaPlugin {
     public final String prefix = "§e[§r§bCommonly§r§9§lU§r§e] §r";
+    private Settings settings;
     private final Map<UUID, Location> lastLocations = new HashMap<>();
     private final Map<UUID, Long> teleportCooldowns = new HashMap<>();
-    private final int teleportCooldown = 15000;
 
     @Override
     public void onEnable() {
@@ -24,6 +25,9 @@ public final class CommonlyUsed extends JavaPlugin {
         // Register commands
         getCommand("back").setExecutor(new BackCommand(this));
         getCommand("slimechunk").setExecutor(new SlimeChunkCommand(this));
+        getCommand("craft").setExecutor(new CraftingBenchCommand());
+        getCommand("enderchest").setExecutor(new EnderChestCommand());
+        getCommand("inventory").setExecutor(new InventoryCommand(this));
         // home commands
         HomeCommands homeCommands = new HomeCommands(this);
         getCommand("sethome").setExecutor(homeCommands);
@@ -40,8 +44,16 @@ public final class CommonlyUsed extends JavaPlugin {
         getCommand("warp").setExecutor(warpCommands);
         getCommand("warplist").setExecutor(warpCommands);
 
+        // Register tab completer
+        getCommand("inventory").setTabCompleter(new PlayerNameTabCompleter());
+        getCommand("warp").setTabCompleter(warpCommands);
+        getCommand("delwarp").setTabCompleter(warpCommands);
+
         // Register listeners
         getServer().getPluginManager().registerEvents(new BackListener(this), this);
+
+        // Load settings
+        settings = new Settings(this);
     }
 
     @Override
@@ -49,17 +61,15 @@ public final class CommonlyUsed extends JavaPlugin {
         // Plugin shutdown logic
     }
 
-    public long getTeleportCooldown(UUID uniquePlayerId) {
-        if (teleportCooldowns.containsKey(uniquePlayerId)) {
-            return teleportCooldowns.get(uniquePlayerId);
-        }
-        return 0;
+    public Settings getSettings() {
+        return settings;
     }
+
     public boolean isPlayerOnTeleportCooldown(UUID uniquePlayerId) {
-        return teleportCooldowns.containsKey(uniquePlayerId) && System.currentTimeMillis() - teleportCooldowns.get(uniquePlayerId) < teleportCooldown;
+        return teleportCooldowns.containsKey(uniquePlayerId) && System.currentTimeMillis() - teleportCooldowns.get(uniquePlayerId) < (settings.getTeleportCooldown() * 1000L);
     }
     public String getTeleportCooldownMessage(UUID uniquePlayerId) {
-        long remainingTime = teleportCooldown - (System.currentTimeMillis() - teleportCooldowns.get(uniquePlayerId));
+        long remainingTime = (settings.getTeleportCooldown() * 1000L) - (System.currentTimeMillis() - teleportCooldowns.get(uniquePlayerId));
         return prefix+"§cYou must wait §6" + (remainingTime / 1000) + " §cseconds before you can teleport using any command again.";
     }
     public void addTeleportCooldown(UUID uniquePlayerId) {
@@ -68,7 +78,7 @@ public final class CommonlyUsed extends JavaPlugin {
 
     public void teleportAfterDelay(Player player, Location location, int delayInSeconds, String completionMessage) {
         new BukkitRunnable() {
-            int count = 3;
+            int count = delayInSeconds;
             @Override
             public void run() {
                 if (count > 0) {

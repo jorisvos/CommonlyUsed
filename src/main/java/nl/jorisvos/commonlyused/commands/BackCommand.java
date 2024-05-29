@@ -35,15 +35,15 @@ public class BackCommand implements CommandExecutor {
         if (plugin.isPlayerOnTeleportCooldown(player.getUniqueId())) {
             player.sendMessage(plugin.getTeleportCooldownMessage(player.getUniqueId()));
             return true;
-        } else if (backCooldowns.containsKey(player.getUniqueId()) && System.currentTimeMillis() - backCooldowns.get(player.getUniqueId()) < 30000) {
-            long remainingTime = 30000 - (System.currentTimeMillis() - backCooldowns.get(player.getUniqueId()));
+        } else if (backCooldowns.containsKey(player.getUniqueId()) && System.currentTimeMillis() - backCooldowns.get(player.getUniqueId()) < (plugin.getSettings().getBackCooldown() * 1000L)) {
+            long remainingTime = (plugin.getSettings().getBackCooldown() * 1000L) - (System.currentTimeMillis() - backCooldowns.get(player.getUniqueId()));
             player.sendMessage(plugin.prefix+"§cYou must wait §6" + (remainingTime / 1000) + " §cseconds before you can teleport to your last location again.");
             return true;
         }
 
         backCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
         plugin.addTeleportCooldown(player.getUniqueId());
-        plugin.teleportAfterDelay(player, plugin.getLastLocation(player.getUniqueId()), 3, "Teleported to your last location.");
+        plugin.teleportAfterDelay(player, plugin.getLastLocation(player.getUniqueId()), plugin.getSettings().getBackDelay(), "Teleported to your last location.");
         return true;
     }
 }

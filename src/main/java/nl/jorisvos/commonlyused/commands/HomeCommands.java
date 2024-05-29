@@ -29,6 +29,7 @@ public class HomeCommands implements CommandExecutor {
         // Initialize config file
         configFile = new File(plugin.getDataFolder(), "homes.yml");
         if (!configFile.exists()) {
+            //noinspection ResultOfMethodCallIgnored
             configFile.getParentFile().mkdirs();
             plugin.saveResource("homes.yml", false);
         }
@@ -80,8 +81,8 @@ public class HomeCommands implements CommandExecutor {
         if (plugin.isPlayerOnTeleportCooldown(player.getUniqueId())) {
             player.sendMessage(plugin.getTeleportCooldownMessage(player.getUniqueId()));
             return;
-        } else if (homeCooldowns.containsKey(player.getUniqueId()) && System.currentTimeMillis() - homeCooldowns.get(player.getUniqueId()) < 60000) {
-            long remainingTime = 60000 - (System.currentTimeMillis() - homeCooldowns.get(player.getUniqueId()));
+        } else if (homeCooldowns.containsKey(player.getUniqueId()) && System.currentTimeMillis() - homeCooldowns.get(player.getUniqueId()) < (plugin.getSettings().getHomeCooldown() * 1000L)) {
+            long remainingTime = (plugin.getSettings().getHomeCooldown() * 1000L) - (System.currentTimeMillis() - homeCooldowns.get(player.getUniqueId()));
             player.sendMessage(plugin.prefix + "§cYou must wait §6" + (remainingTime / 1000) + " §cseconds before you can teleport to home again.");
             return;
         }
@@ -89,7 +90,7 @@ public class HomeCommands implements CommandExecutor {
         Location homeLocation = homeLocations.get(player.getUniqueId());
         homeCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
         plugin.addTeleportCooldown(player.getUniqueId());
-        plugin.teleportAfterDelay(player, homeLocation, 3, "Teleported home.");
+        plugin.teleportAfterDelay(player, homeLocation, plugin.getSettings().getHomeDelay(), "Teleported home.");
     }
 
     private void deleteHome(Player player) {
@@ -121,18 +122,17 @@ public class HomeCommands implements CommandExecutor {
         config = new YamlConfiguration();
         for (UUID playerId : homeLocations.keySet()) {
             Location location = homeLocations.get(playerId);
-            config.set(playerId.toString() + ".world", location.getWorld().getName());
-            config.set(playerId.toString() + ".x", location.getX());
-            config.set(playerId.toString() + ".y", location.getY());
-            config.set(playerId.toString() + ".z", location.getZ());
-            config.set(playerId.toString() + ".yaw", location.getYaw());
-            config.set(playerId.toString() + ".pitch", location.getPitch());
+            config.set(playerId + ".world", location.getWorld().getName());
+            config.set(playerId + ".x", location.getX());
+            config.set(playerId + ".y", location.getY());
+            config.set(playerId + ".z", location.getZ());
+            config.set(playerId + ".yaw", location.getYaw());
+            config.set(playerId + ".pitch", location.getPitch());
         }
         try {
             config.save(configFile);
         } catch (IOException e) {
             plugin.getLogger().warning("Could not save home locations to file.");
-            e.printStackTrace();
         }
     }
 }
