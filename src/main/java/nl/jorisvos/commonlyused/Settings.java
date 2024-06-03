@@ -23,13 +23,21 @@ public class Settings {
     private int warpDelay = 3;
 
     public Settings(final CommonlyUsed plugin) {
+        // Check if plugins DataFolder exists, if not create it
+        if (!plugin.getDataFolder().exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            plugin.getDataFolder().mkdirs();
+        }
+
+        // Save the default configuration if it does not exist
+        plugin.saveDefaultConfig();
+        // Ensure the default values are copied to the configuration (without overriding)
+        plugin.getConfig().options().copyDefaults(true);
+        // Save the config with the defaults to the configuration
+        plugin.saveConfig();
+
         // Initialize config file
         File configFile = new File(plugin.getDataFolder(), "config.yml");
-        if (!configFile.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            configFile.getParentFile().mkdirs();
-            plugin.saveResource("config.yml", false);
-        }
         config = YamlConfiguration.loadConfiguration(configFile);
         loadConfig();
     }

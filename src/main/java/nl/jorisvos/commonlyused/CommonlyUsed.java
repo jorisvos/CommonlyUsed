@@ -1,7 +1,12 @@
 package nl.jorisvos.commonlyused;
 
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import nl.jorisvos.commonlyused.commands.*;
-import nl.jorisvos.commonlyused.listeners.BackListener;
+import nl.jorisvos.commonlyused.listeners.PlayerListener;
 import nl.jorisvos.commonlyused.tabcompleters.PlayerNameTabCompleter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -28,6 +33,11 @@ public final class CommonlyUsed extends JavaPlugin {
         getCommand("craft").setExecutor(new CraftingBenchCommand());
         getCommand("enderchest").setExecutor(new EnderChestCommand());
         getCommand("inventory").setExecutor(new InventoryCommand(this));
+        getCommand("fly").setExecutor(new FlyCommand(this));
+        getCommand("spectator").setExecutor(new SpectatorCommand(this));
+        getCommand("heal").setExecutor(new HealCommand(this));
+        SpeedCommand speedCommand = new SpeedCommand(this);
+        getCommand("speed").setExecutor(speedCommand);
         // home commands
         HomeCommands homeCommands = new HomeCommands(this);
         getCommand("sethome").setExecutor(homeCommands);
@@ -48,9 +58,10 @@ public final class CommonlyUsed extends JavaPlugin {
         getCommand("inventory").setTabCompleter(new PlayerNameTabCompleter());
         getCommand("warp").setTabCompleter(warpCommands);
         getCommand("delwarp").setTabCompleter(warpCommands);
+        getCommand("speed").setTabCompleter(speedCommand);
 
         // Register listeners
-        getServer().getPluginManager().registerEvents(new BackListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
         // Load settings
         settings = new Settings(this);
@@ -104,5 +115,19 @@ public final class CommonlyUsed extends JavaPlugin {
 
     public void setLastLocation(UUID playerId, Location location) {
         lastLocations.put(playerId, location);
+    }
+
+    public TextComponent getClickableMessage(String message, String command) {
+        TextComponent textComponent = new TextComponent(message);
+        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command));
+
+        Text hoverText = new Text(command);
+        HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText);
+
+        textComponent.setHoverEvent(hoverEvent);
+        return textComponent;
+    }
+    public void sendClickableMessage(Player player, BaseComponent[] baseComponent) {
+        player.spigot().sendMessage(baseComponent);
     }
 }

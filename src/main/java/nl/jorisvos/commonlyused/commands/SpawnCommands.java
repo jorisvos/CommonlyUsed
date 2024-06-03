@@ -139,7 +139,7 @@ public class SpawnCommands implements CommandExecutor, TabCompleter {
         config.set("spawns." + world.getName() + ".yaw", location.getYaw());
         config.set("spawns." + world.getName() + ".pitch", location.getPitch());
         plugin.saveConfig();
-        player.sendMessage(plugin.prefix+"§Spawn set.");
+        player.sendMessage(plugin.prefix+"§aSpawn set.");
     }
 
     private Location getWorldSpawn(World world) {

@@ -53,6 +53,21 @@ commands:
     description: Opens an inventory of [player]
     permission: commonlyused.command.inventory
     aliases: [invsee, inventorysee, seeinv]
+  fly:
+    description: Toggle fly mode.
+    permission: commonlyused.command.fly
+    aliases: [f]
+  spectator:
+    description: Toggle spectator mode.
+    permission: commonlyused.command.spectator
+    aliases: [s]
+  heal:
+    description: Set players health and saturation to full.
+    permission: commonlyused.command.heal
+  speed:
+    description: Set your movement speed.
+    permission: commonlyused.command.speed
+    usage: /speed [<walk|fly>/reset] <value>
 permissions:
   commonlyused.*:
     description: Grants access to all CommonlyUsed permissions.
@@ -87,6 +102,10 @@ permissions:
       commonlyused.command.workbench: true
       commonlyused.command.enderchest: true
       commonlyused.command.inventory: true
+      commonlyused.command.fly: true
+      commonlyused.command.spectator: true
+      commonlyused.command.heal: true
+      commonlyused.command.speed: true
   commonlyused.command.sethome:
     description: Allows players to set their home location.
     default: true
@@ -136,3 +155,15 @@ permissions:
   commonlyused.command.inventory:
     description: Allows players to open an inventory of [player].
     default: false
+  commonlyused.command.fly:
+    description: Allows players to enable or disable fly mode.
+    default: op
+  commonlyused.command.spectator:
+    description: Allows players to enable or disable spectator mode.
+    default: op
+  commonlyused.command.heal:
+    description: Allows players to set their health and saturation to full.
+    default: op
+  commonlyused.command.speed:
+    description: Allows players to set their walk and/or flying speed.
+    default: op

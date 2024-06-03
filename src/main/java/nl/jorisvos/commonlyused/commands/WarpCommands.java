@@ -1,5 +1,7 @@
 package nl.jorisvos.commonlyused.commands;
 
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import nl.jorisvos.commonlyused.CommonlyUsed;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -141,12 +143,15 @@ public class WarpCommands implements CommandExecutor, TabCompleter {
             return;
         }
 
-        StringBuilder warpList = new StringBuilder(plugin.prefix+"§aWarp list:");
+        ComponentBuilder builder = new ComponentBuilder(plugin.prefix+"§aWarp list:");
         for (String warpName : warpLocations.keySet()) {
             Location location = warpLocations.get(warpName);
-            warpList.append("\n§f - §6").append(warpName).append("[§d").append(location.getWorld().getName()).append("§6]");
+            String message = "§f - §6"+warpName+"[§d"+location.getWorld().getName()+"§6]";
+            String command = "/warp "+warpName;
+            TextComponent textComponent = plugin.getClickableMessage(message, command);
+            builder.append("\n").append(textComponent);
         }
-        player.sendMessage(warpList.toString());
+        plugin.sendClickableMessage(player, builder.create());
     }
 
     private void loadWarpLocations() {
