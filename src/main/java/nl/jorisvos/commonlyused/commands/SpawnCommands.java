@@ -118,7 +118,6 @@ public class SpawnCommands implements CommandExecutor, TabCompleter {
         }
 
         spawnCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
-        plugin.addTeleportCooldown(player.getUniqueId());
         World world = player.getWorld();
         Location spawnLocation = getWorldSpawn(world);
         if (spawnLocation == null) {
@@ -139,7 +138,7 @@ public class SpawnCommands implements CommandExecutor, TabCompleter {
         config.set("spawns." + world.getName() + ".yaw", location.getYaw());
         config.set("spawns." + world.getName() + ".pitch", location.getPitch());
         plugin.saveConfig();
-        player.sendMessage(plugin.prefix+"§Spawn set.");
+        player.sendMessage(plugin.prefix+"§aSpawn set.");
     }
 
     private Location getWorldSpawn(World world) {

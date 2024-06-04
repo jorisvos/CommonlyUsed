@@ -42,7 +42,6 @@ public class BackCommand implements CommandExecutor {
         }
 
         backCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
-        plugin.addTeleportCooldown(player.getUniqueId());
         plugin.teleportAfterDelay(player, plugin.getLastLocation(player.getUniqueId()), plugin.getSettings().getBackDelay(), "Teleported to your last location.");
         return true;
     }

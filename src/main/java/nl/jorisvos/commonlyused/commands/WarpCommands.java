@@ -1,41 +1,24 @@
 package nl.jorisvos.commonlyused.commands;
 
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import nl.jorisvos.commonlyused.CommonlyUsed;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class WarpCommands implements CommandExecutor, TabCompleter {
     private final CommonlyUsed plugin;
-    private final Map<String, Location> warpLocations = new HashMap<>();
     private final Map<UUID, Long> warpCooldowns = new HashMap<>();
-    private final File configFile;
-    private FileConfiguration config;
 
     public WarpCommands(CommonlyUsed plugin) {
         this.plugin = plugin;
-
-        // Initialize config file
-        configFile = new File(plugin.getDataFolder(), "warps.yml");
-        if (!configFile.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            configFile.getParentFile().mkdirs();
-            plugin.saveResource("warps.yml", false);
-        }
-        config = YamlConfiguration.loadConfiguration(configFile);
-
-        // Load warp locations from the config file
-        loadWarpLocations();
     }
 
     @Override
@@ -63,7 +46,7 @@ public class WarpCommands implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            List<String> warpNames = new ArrayList<>(warpLocations.keySet());
+            List<String> warpNames = plugin.getSettings().warpNames();
             return warpNames.stream().filter(name -> name.startsWith(args[0])).collect(Collectors.toList());
         }
         return null;
@@ -80,8 +63,8 @@ public class WarpCommands implements CommandExecutor, TabCompleter {
             return;
         }
 
-        warpLocations.put(warpName, player.getLocation());
-        saveWarpLocations();
+        plugin.getSettings().addWarp(warpName, player.getLocation());
+        plugin.getSettings().saveWarpConfig();
         player.sendMessage(plugin.prefix+"§aWarp[§6"+warpName+"§a] location set.");
     }
 
@@ -96,8 +79,8 @@ public class WarpCommands implements CommandExecutor, TabCompleter {
             return;
         }
 
-        warpLocations.remove(warpName);
-        saveWarpLocations();
+        plugin.getSettings().removeWarp(warpName);
+        plugin.getSettings().saveWarpConfig();
         player.sendMessage(plugin.prefix+"§aWarp[§6"+warpName+"§a] location removed.");
     }
 
@@ -110,7 +93,7 @@ public class WarpCommands implements CommandExecutor, TabCompleter {
         if (warpName.isBlank()) {
             player.sendMessage(plugin.prefix+"§cYou can't leave the warp name empty.");
             return;
-        } else if (!warpLocations.containsKey(warpName)) {
+        } else if (!plugin.getSettings().isWarp(warpName)) {
             player.sendMessage(plugin.prefix+"§cThat's not a valid warp name!");
             return;
         }
@@ -124,9 +107,8 @@ public class WarpCommands implements CommandExecutor, TabCompleter {
             return;
         }
 
-        Location warpLocation = warpLocations.get(warpName);
+        Location warpLocation = plugin.getSettings().getWarp(warpName);
         warpCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
-        plugin.addTeleportCooldown(player.getUniqueId());
         plugin.teleportAfterDelay(player, warpLocation, plugin.getSettings().getWarpDelay(), "Teleported to warp[§6"+warpName+"§a].");
     }
 
@@ -136,47 +118,19 @@ public class WarpCommands implements CommandExecutor, TabCompleter {
             return;
         }
 
-        if (warpLocations.isEmpty()) {
+        if (plugin.getSettings().isWarpEmpty()) {
             player.sendMessage(plugin.prefix+"§cThere are no warps.");
             return;
         }
 
-        StringBuilder warpList = new StringBuilder(plugin.prefix+"§aWarp list:");
-        for (String warpName : warpLocations.keySet()) {
-            Location location = warpLocations.get(warpName);
-            warpList.append("\n§f - §6").append(warpName).append("[§d").append(location.getWorld().getName()).append("§6]");
+        ComponentBuilder builder = new ComponentBuilder(plugin.prefix+"§aWarp list:");
+        for (String warpName : plugin.getSettings().warpNames()) {
+            Location location = plugin.getSettings().getWarp(warpName);
+            String message = "§f - §6"+warpName+"[§d"+location.getWorld().getName()+"§6]";
+            String command = "/warp "+warpName;
+            TextComponent textComponent = plugin.getClickableMessage(message, command);
+            builder.append("\n").append(textComponent);
         }
-        player.sendMessage(warpList.toString());
-    }
-
-    private void loadWarpLocations() {
-        for (String warpName : config.getKeys(false)) {
-            String worldName = config.getString(warpName + ".world");
-            double x = config.getDouble(warpName + ".x");
-            double y = config.getDouble(warpName + ".y");
-            double z = config.getDouble(warpName + ".z");
-            float yaw = (float) config.getDouble(warpName + ".yaw");
-            float pitch = (float) config.getDouble(warpName + ".pitch");
-            Location location = new Location(plugin.getServer().getWorld(worldName), x, y, z, yaw, pitch);
-            warpLocations.put(warpName, location);
-        }
-    }
-
-    private void saveWarpLocations() {
-        config = new YamlConfiguration();
-        for (String warpName : warpLocations.keySet()) {
-            Location location = warpLocations.get(warpName);
-            config.set(warpName + ".world", location.getWorld().getName());
-            config.set(warpName + ".x", location.getX());
-            config.set(warpName + ".y", location.getY());
-            config.set(warpName + ".z", location.getZ());
-            config.set(warpName + ".yaw", location.getYaw());
-            config.set(warpName + ".pitch", location.getPitch());
-        }
-        try {
-            config.save(configFile);
-        } catch (IOException e) {
-            plugin.getLogger().warning("Could not save warp locations to file.");
-        }
+        plugin.sendClickableMessage(player, builder.create());
     }
 }

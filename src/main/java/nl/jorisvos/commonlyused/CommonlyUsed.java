@@ -1,8 +1,14 @@
 package nl.jorisvos.commonlyused;
 
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import nl.jorisvos.commonlyused.commands.*;
-import nl.jorisvos.commonlyused.listeners.BackListener;
+import nl.jorisvos.commonlyused.listeners.PlayerListener;
 import nl.jorisvos.commonlyused.tabcompleters.PlayerNameTabCompleter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,6 +34,13 @@ public final class CommonlyUsed extends JavaPlugin {
         getCommand("craft").setExecutor(new CraftingBenchCommand());
         getCommand("enderchest").setExecutor(new EnderChestCommand());
         getCommand("inventory").setExecutor(new InventoryCommand(this));
+        getCommand("fly").setExecutor(new FlyCommand(this));
+        getCommand("spectator").setExecutor(new SpectatorCommand(this));
+        getCommand("heal").setExecutor(new HealCommand(this));
+        getCommand("nickname").setExecutor(new NicknameCommand(this));
+        getCommand("realname").setExecutor(new RealnameCommand(this));
+        SpeedCommand speedCommand = new SpeedCommand(this);
+        getCommand("speed").setExecutor(speedCommand);
         // home commands
         HomeCommands homeCommands = new HomeCommands(this);
         getCommand("sethome").setExecutor(homeCommands);
@@ -43,14 +56,22 @@ public final class CommonlyUsed extends JavaPlugin {
         getCommand("delwarp").setExecutor(warpCommands);
         getCommand("warp").setExecutor(warpCommands);
         getCommand("warplist").setExecutor(warpCommands);
+        // tpa commands
+        TpaCommand tpaCommands = new TpaCommand(this);
+        getCommand("tpa").setExecutor(tpaCommands);
+        getCommand("tpaccept").setExecutor(tpaCommands);
+        getCommand("tpdeny").setExecutor(tpaCommands);
+        getCommand("tpcancel").setExecutor(tpaCommands);
 
         // Register tab completer
         getCommand("inventory").setTabCompleter(new PlayerNameTabCompleter());
         getCommand("warp").setTabCompleter(warpCommands);
         getCommand("delwarp").setTabCompleter(warpCommands);
+        getCommand("speed").setTabCompleter(speedCommand);
+        getCommand("realname").setTabCompleter(new PlayerNameTabCompleter());
 
         // Register listeners
-        getServer().getPluginManager().registerEvents(new BackListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
         // Load settings
         settings = new Settings(this);
@@ -72,8 +93,9 @@ public final class CommonlyUsed extends JavaPlugin {
         long remainingTime = (settings.getTeleportCooldown() * 1000L) - (System.currentTimeMillis() - teleportCooldowns.get(uniquePlayerId));
         return prefix+"§cYou must wait §6" + (remainingTime / 1000) + " §cseconds before you can teleport using any command again.";
     }
-    public void addTeleportCooldown(UUID uniquePlayerId) {
-        teleportCooldowns.put(uniquePlayerId, System.currentTimeMillis());
+    public String getTeleportCooldownMessageForPlayer(UUID uniquePlayerId) {
+        long remainingTime = (settings.getTeleportCooldown() * 1000L) - (System.currentTimeMillis() - teleportCooldowns.get(uniquePlayerId));
+        return prefix+"§cPlayer[§6"+getDisplayName(uniquePlayerId)+"§c] must wait §6" + (remainingTime / 1000) + " §cseconds before he/she can teleport using any command again.";
     }
 
     public void teleportAfterDelay(Player player, Location location, int delayInSeconds, String completionMessage) {
@@ -104,5 +126,30 @@ public final class CommonlyUsed extends JavaPlugin {
 
     public void setLastLocation(UUID playerId, Location location) {
         lastLocations.put(playerId, location);
+    }
+
+    public TextComponent getClickableMessage(String message, String command) {
+        TextComponent textComponent = new TextComponent(message);
+        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command));
+
+        Text hoverText = new Text(command);
+        HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText);
+
+        textComponent.setHoverEvent(hoverEvent);
+        return textComponent;
+    }
+    public void sendClickableMessage(Player player, BaseComponent[] baseComponent) {
+        player.spigot().sendMessage(baseComponent);
+    }
+
+    public String getDisplayName(UUID playerId) { return getDisplayName(Bukkit.getPlayer(playerId)); }
+    public String getDisplayName(Player player) {
+        if (player == null) {
+            return "[player=offline]";
+        } else if (settings.hasNickname(player.getUniqueId())) {
+            return settings.getNickname(player.getUniqueId());
+        } else {
+            return player.getName();
+        }
     }
 }
