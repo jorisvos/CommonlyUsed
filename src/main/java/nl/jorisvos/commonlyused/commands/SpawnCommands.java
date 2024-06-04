@@ -118,7 +118,6 @@ public class SpawnCommands implements CommandExecutor, TabCompleter {
         }
 
         spawnCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
-        plugin.addTeleportCooldown(player.getUniqueId());
         World world = player.getWorld();
         Location spawnLocation = getWorldSpawn(world);
         if (spawnLocation == null) {

@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
@@ -47,6 +48,19 @@ public class PlayerListener implements Listener {
                     "CommonlyUsed"),
                     () -> player.sendMessage(plugin.prefix+"§cFly mode disabled due to logout."),
                     1L);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        if (plugin.getSettings().hasNickname(player.getUniqueId())) {
+            String nickname = plugin.getSettings().getNickname(player.getUniqueId());
+            player.setDisplayName(nickname);
+            player.setPlayerListName(nickname);
+            player.sendMessage(plugin.prefix+"§aWelcome back, §b"+nickname);
+        } else {
+            player.sendMessage(plugin.prefix+"§aWelcome back, §b"+player.getName());
         }
     }
 }

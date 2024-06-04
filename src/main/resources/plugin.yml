@@ -68,6 +68,32 @@ commands:
     description: Set your movement speed.
     permission: commonlyused.command.speed
     usage: /speed [<walk|fly>/reset] <value>
+  nickname:
+    description: Change your display name.
+    permission: commonlyused.command.nickname
+    aliases: [nick, name]
+    usage: /nickname [<nickname>]
+  realname:
+    description: Shows real in-game name of player.
+    permission: commonlyused.command.realname
+    aliases: [real]
+    usage: /realname <player>
+  tpa:
+    description: Send a teleport request to <player>
+    permission: commonlyused.command.tpa.tpa
+    usage: /tpa <player>
+  tpaccept:
+    description: Accept a teleport request from <player>
+    permission: commonlyused.command.tpa.tpaccept
+    usage: /tpaccept
+  tpdeny:
+    description: Deny a teleport request from <player>
+    permission: commonlyused.command.tpa.tpdeny
+    usage: /tpdeny
+  tpcancel:
+    description: Cancel your teleport request to <player>
+    permission: commonlyused.command.tpa.tpcancel
+    usage: /tpcancel
 permissions:
   commonlyused.*:
     description: Grants access to all CommonlyUsed permissions.
@@ -106,6 +132,9 @@ permissions:
       commonlyused.command.spectator: true
       commonlyused.command.heal: true
       commonlyused.command.speed: true
+      commonlyused.command.nickname: true
+      commonlyused.command.realname: true
+      commonlyused.command.tpa: true
   commonlyused.command.sethome:
     description: Allows players to set their home location.
     default: true
@@ -167,3 +196,29 @@ permissions:
   commonlyused.command.speed:
     description: Allows players to set their walk and/or flying speed.
     default: op
+  commonlyused.command.nickname:
+    description: Allows players to change their display name.
+    default: true
+  commonlyused.command.realname:
+    description: Allows players to see the real in-game name of a player (when they have set a nickname).
+    default: op
+  commonlyused.command.tpa:
+    description: Grants access to all tpa commands.
+    default: true
+    children:
+      commonlyused.command.tpa.tpa: true
+      commonlyused.command.tpa.tpaccept: true
+      commonlyused.command.tpa.tpdeny: true
+      commonlyused.command.tpa.tpcancel: true
+  commonlyused.command.tpa.tpa:
+    description: Allows players to send a teleport request to a player.
+    default: true
+  commonlyused.command.tpa.tpaccept:
+    description: Allows players to accept a teleport request from a player.
+    default: true
+  commonlyused.command.tpa.tpdeny:
+    description: Allows players to deny a teleport request from a player.
+    default: true
+  commonlyused.command.tpa.tpcancel:
+    description: Allows players to cancel their teleport request to a player.
+    default: true

@@ -13,6 +13,8 @@ cooldowns:
   home: 60
   spawn: 120
   warp: 120
+  tpa: 120
+  tpaccept: 60
 
 # The delays for the different commands (wait n seconds after issuing the command before it gets executed).
 delays:
@@ -20,3 +22,4 @@ delays:
   home: 3
   spawn: 3
   warp: 3
+  tpa: 3
