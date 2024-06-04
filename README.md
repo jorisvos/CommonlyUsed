@@ -21,3 +21,30 @@ A Minecraft server plugin containing commands like /spawn /home /back and way mo
  - /tpaccept - accepts a teleport request from a player
  - /tpdeny - denies a teleport request from a player
  - /tpcancel - cancels your teleport request to a player
+
+### Permissions
+ - /back - commonlyused.commands.back
+ - /craft - commonlyused.commands.workbench
+ - /enderchest - commonlyused.commands.enderchest
+ - /sethome - commonlyused.commands.sethome
+ - /home - commonlyused.commands.home
+ - /delhome - commonlyused.commands.delhome
+ - /inventory - commonlyused.commands.inventory
+ - /slimechunk - commonlyused.commands.slimechunk
+ - /setspawn - commonlyused.commands.setspawn
+ - /spawn - commonlyused.commands.spawn
+ - /setwarp - commonlyused.commands.setwarp
+ - /warp - commonlyused.commands.warp
+ - /delwarp - commonlyused.commands.delwarp
+ - /warplist - commonlyused.commands.warplist
+ - /heal - commonlyused.commands.heal
+ - /fly - commonlyused.commands.fly
+ - /spectator - commonlyused.commands.spectator
+ - /speed - commonlyused.commands.speed
+ - /nickname - commonlyused.commands.nickname
+ - /realname - commonlyused.commands.realname
+ - All tpa commands - commonlyused.commands.tpa
+ - /tpa - commonlyused.commands.tpa.tpa
+ - /tpaccept - commonlyused.commands.tpa.tpaccept
+ - /tpdeny - commonlyused.commands.tpa.tpdeny
+ - /tpcancel - commonlyused.commands.tpa.tpcancel
